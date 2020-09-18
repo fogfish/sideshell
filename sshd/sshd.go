@@ -21,12 +21,12 @@ import (
 )
 
 //
-type Server struct {
+type server struct {
 	config *ssh.ServerConfig
 	shell  string
 }
 
-// <- proxy mode
+// ViaProxy listen ssh session using tcp relay-proxy
 func ViaProxy(host string, opts ...Config) {
 	daemon := New(opts...)
 
@@ -45,7 +45,7 @@ func ViaProxy(host string, opts ...Config) {
 
 }
 
-// <- server mode
+// Listen ssh sessions on the port
 func Listen(port string, opts ...Config) {
 	daemon := New(opts...)
 
@@ -67,8 +67,8 @@ func Listen(port string, opts ...Config) {
 }
 
 //
-func New(opts ...Config) *Server {
-	srv := &Server{
+func New(opts ...Config) *server {
+	srv := &server{
 		config: &ssh.ServerConfig{},
 		shell:  "sh",
 	}
@@ -79,7 +79,7 @@ func New(opts ...Config) *Server {
 }
 
 //
-func (srv *Server) Accept(sock net.Conn) error {
+func (srv *server) Accept(sock net.Conn) error {
 	// New creates ssh daemon on the given connection
 	sshSock, chans, reqs, err := ssh.NewServerConn(sock, srv.config)
 
@@ -99,14 +99,14 @@ func (srv *Server) Accept(sock net.Conn) error {
 	return nil
 }
 
-func (srv *Server) handleChannels(chans <-chan ssh.NewChannel) {
+func (srv *server) handleChannels(chans <-chan ssh.NewChannel) {
 	// Service the incoming Channel channel in go routine
 	for newChannel := range chans {
 		go srv.handleChannel(newChannel)
 	}
 }
 
-func (srv *Server) handleChannel(newChannel ssh.NewChannel) {
+func (srv *server) handleChannel(newChannel ssh.NewChannel) {
 	// Since we're handling a shell, we expect a
 	// channel type of "session". The also describes
 	// "x11", "direct-tcpip" and "forwarded-tcpip"

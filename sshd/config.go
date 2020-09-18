@@ -19,11 +19,11 @@ import (
 )
 
 //
-type Config func(*Server)
+type Config func(*server)
 
 //
 func Credentials(access, secret string) Config {
-	return func(s *Server) {
+	return func(s *server) {
 		s.config.PasswordCallback = func(c ssh.ConnMetadata, pass []byte) (*ssh.Permissions, error) {
 			// Should use constant-time compare (or better, salt+hash) in a production setting.
 			if c.User() == access && string(pass) == secret {
@@ -36,7 +36,7 @@ func Credentials(access, secret string) Config {
 
 //
 func PrivateKey(bits int) Config {
-	return func(s *Server) {
+	return func(s *server) {
 		key, err := rsa.GenerateKey(rand.Reader, bits)
 		if err != nil {
 			log.Fatalf("Failed to generate private key (%d bits)", bits)
@@ -58,7 +58,7 @@ func PrivateKey(bits int) Config {
 
 //
 func PrivateKeyFile(idfile string) Config {
-	return func(s *Server) {
+	return func(s *server) {
 		bytes, err := ioutil.ReadFile("id_rsa")
 		if err != nil {
 			log.Fatalf("Failed to load private key (%s)", idfile)
@@ -74,7 +74,7 @@ func PrivateKeyFile(idfile string) Config {
 
 //
 func Shell(shell string) Config {
-	return func(s *Server) {
+	return func(s *server) {
 		s.shell = shell
 	}
 }
