@@ -80,3 +80,6 @@ ssh -p 8022 \
   foo@localhost 
 ```
 
+## License
+
+[![See LICENSE](https://img.shields.io/github/license/fogfish/sideshell.svg?style=for-the-badge)](LICENSE)
