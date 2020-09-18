@@ -25,5 +25,6 @@ func main() {
 			os.Getenv("CONFIG_SSHD_SECRET"),
 		),
 		sshd.PrivateKey(4096),
+		sshd.Shell("bash"),
 	)
 }
