@@ -17,6 +17,7 @@ var (
 	proxy  string
 	access string
 	secret string
+	shell  string
 )
 
 func init() {
@@ -30,6 +31,8 @@ func init() {
 
 	daemonCmd.Flags().StringVar(&secret, "secret", "", "secret key (aka password) to access the shell")
 	daemonCmd.MarkFlagRequired("secret")
+
+	daemonCmd.Flags().StringVar(&shell, "shell", "sh", "shell program to use")
 }
 
 var daemonCmd = &cobra.Command{
@@ -48,6 +51,7 @@ func daemon(cmd *cobra.Command, args []string) error {
 		proxy,
 		sshd.Credentials(access, secret),
 		sshd.PrivateKey(4096),
+		sshd.Shell(shell),
 	)
 	return nil
 }
